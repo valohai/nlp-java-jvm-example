@@ -41,8 +41,4 @@ COPY mallet.sh mallet.sh
 COPY rdrposttagger.sh rdrposttagger.sh
 
 ARG GROUP
-#RUN cd ${WORKDIR} && chown -R nlp-java:${GROUP} .
-
-#USER nlp-java
-
-#CMD ["/bin/bash"]
+RUN cd ${WORKDIR} && chown -R jovyan:${GROUP} .

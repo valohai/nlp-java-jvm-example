@@ -42,16 +42,12 @@ RUN unzip -version
 RUN git --version
 RUN vim --version
 
-### Setup user
+### Install the Jupyter Java Kernel
 
-ARG GROUP
-#RUN useradd -g ${GROUP} nlp-java
+COPY install-java-kernel.sh install-java-kernel.sh
+RUN ./install-java-kernel.sh
+
+### Setup user
 COPY .bashrc .bashrc_custom
 RUN cat .bashrc_custom >> /home/jovyan/.bashrc
 RUN rm .bashrc_custom
-#RUN cd ${WORKDIR} && chown -R nlp-java:${GROUP} .
-
-#ENV HOME=${WORKDIR}
-
-#ENTRYPOINT [""]
-#CMD [""]
