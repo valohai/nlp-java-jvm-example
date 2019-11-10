@@ -29,17 +29,24 @@ runContainer() {
 	askDockerUserNameIfAbsent
 	setVariables
 
+	if [[ -z "${VALOHAI_PASSWORD:-}" ]]; then
+		read -s -p "Enter Valohai password: " VALOHAI_PASSWORD
+	fi
+
+	echo ""; 
 	echo "Running container ${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}"; echo ""
 
-	set -x
-	${TIME_IT} docker run --rm                                  \
-                ${INTERACTIVE_MODE}                             \
-                --workdir ${WORKDIR}                            \
-                --env JDK_TO_USE=${JDK_TO_USE:-}                \
-                --env JAVA_OPTS=${JAVA_OPTS:-}                  \
-                --volume $(pwd)/shared:${WORKDIR}/shared        \
-                ${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}
-	set +x
+	${TIME_IT} docker run                                  \
+	            --rm                                       \
+                ${INTERACTIVE_MODE}                        \
+                ${TOGGLE_ENTRYPOINT}                       \
+                -p 8888:8888                               \
+                --workdir ${WORKDIR}                       \
+                --env JDK_TO_USE=${JDK_TO_USE:-}           \
+                --env JAVA_OPTS=${JAVA_OPTS:-}             \
+                --env VALOHAI_PASSWORD=${VALOHAI_PASSWORD} \
+                ${VOLUMES_SHARED}                          \
+                "${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}"
 }
 
 buildImage() {
@@ -51,9 +58,10 @@ buildImage() {
 	echo "* Fetching NLP base docker image ${BASE_FULL_DOCKER_TAG_NAME}:${BASE_IMAGE_VERSION} from Docker Hub"
 	time docker pull ${BASE_FULL_DOCKER_TAG_NAME}:${BASE_IMAGE_VERSION} || true
 	time docker build                                                  \
-	             --build-arg GRAALVM_VERSION="${GRAALVM_VERSION}"      \
+	             --build-arg WORKDIR=${WORKDIR}                        \
+	             --build-arg GROUP=users                               \
 	             --build-arg JAVA_8_HOME="/opt/java/openjdk"           \
-	             --build-arg GRAALVM_HOME="/opt/java/graalvm-ce-${GRAALVM_VERSION}" \
+	             --build-arg GRAALVM_HOME="/opt/java/graalvm"          \
 	             -t ${BASE_FULL_DOCKER_TAG_NAME}:${BASE_IMAGE_VERSION} \
 	             "${IMAGES_DIR}/base/."
 	echo "* Finished building NLP base docker image ${BASE_FULL_DOCKER_TAG_NAME}:${BASE_IMAGE_VERSION}"
@@ -62,6 +70,7 @@ buildImage() {
 	time docker pull ${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION} || true
 	time docker build                                                                        \
 	             --build-arg BASE_IMAGE="${BASE_FULL_DOCKER_TAG_NAME}:${BASE_IMAGE_VERSION}" \
+	             --build-arg GROUP=users                                                     \
 	             -t ${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}                                 \
 	             "${IMAGES_DIR}/${language_id}/."
 	echo "* Finished building NLP ${language_id} docker image ${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}"
@@ -117,10 +126,11 @@ showUsageText() {
                                  --detach
                                  --jdk [GRAALVM]
                                  --javaopts [java opt arguments]
+                                 --notebookMode
+                                 --cleanup
                                  --buildImage
                                  --runContainer
                                  --pushImageToHub
-                                 --cleanup
                                  --help
 
        --dockerUserName      docker user name as on Docker Hub 
@@ -133,6 +143,8 @@ showUsageText() {
                              enables the traditional JDK)
        --javaopts            sets the JAVA_OPTS environment variable 
                              inside the container as it starts
+       --notebookMode        runs the Jupyter/Jupyhai notebook server 
+                             (default: returns to command-prompt on startup)
        --cleanup             (command action) remove exited containers and 
                              dangling images from the local repository
        --buildImage          (command action) build the docker image
@@ -173,11 +185,16 @@ BASE_FULL_DOCKER_TAG_NAME=""
 FULL_DOCKER_TAG_NAME=""
 DOCKER_USER_NAME="${DOCKER_USER_NAME:-}"
 
-WORKDIR=/home/nlp-java
+#/home/nlp-java
+WORKDIR=/home/jovyan/work
 JDK_TO_USE=""
 
 INTERACTIVE_MODE="--interactive --tty"
 TIME_IT="time"
+
+## When run in the console mode (command-prompt available)
+TOGGLE_ENTRYPOINT="--entrypoint /bin/bash"
+VOLUMES_SHARED="--volume "$(pwd)":/home/jovyan/work --volume "$(pwd)"/shared:${WORKDIR}/shared"
 
 if [[ "$#" -eq 0 ]]; then
 	echo "No parameter has been passed. Please see usage below:"
@@ -194,12 +211,15 @@ while [[ "$#" -gt 0 ]]; do case $1 in
   --language)            language_id=${3:-java};
                          shift;;
   --detach)              INTERACTIVE_MODE="--detach";
-                         TIME_IT="";
-                         shift;;
+                         TIME_IT="";;
   --jdk)                 JDK_TO_USE="${2:-}";
                          shift;;
   --javaopts)            JAVA_OPTS="${2:-}";
-                         shift;;                         
+                         shift;;
+  --notebookMode)        ## When run in the notebook mode (command-prompt NOT available)
+                         TOGGLE_ENTRYPOINT=""; ### Disable the ENTRPOINT & CMD directives
+                         VOLUMES_SHARED="--volume "$(pwd)/shared/notebooks":/home/jovyan/work";
+                         ;;
   --buildImage)          buildImage;
                          exit 0;;
   --runContainer)        runContainer;
