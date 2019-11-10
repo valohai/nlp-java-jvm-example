@@ -29,25 +29,34 @@ runContainer() {
 	askDockerUserNameIfAbsent
 	setVariables
 
-	if [[ -z "${VALOHAI_PASSWORD:-}" ]]; then
-		read -s -p "Enter Valohai password: " VALOHAI_PASSWORD
-	fi
+	if [[ "${NOTEBOOK_MODE}" = "true" ]]; then
+		## When run in the notebook mode (command-prompt NOT available)
+		TOGGLE_ENTRYPOINT=""; ### Disable the ENTRPOINT & CMD directives
+		VOLUMES_SHARED="--volume "$(pwd)/shared/notebooks":/home/jovyan/work";
+		if [[ -z "${VALOHAI_PASSWORD:-}" ]]; then
+			read -s -p "Enter Valohai password: " VALOHAI_PASSWORD
+		fi
+	else
+		## When run in the console mode (command-prompt available)
+		TOGGLE_ENTRYPOINT="--entrypoint /bin/bash"
+		VOLUMES_SHARED="--volume "$(pwd)":/home/jovyan/work --volume "$(pwd)"/shared:${WORKDIR}/shared"
+	fi  
 
 	echo ""; 
 	echo "Running container ${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}"; echo ""
 
 	mkdir -p shared/notebooks
 
-	${TIME_IT} docker run                                  \
-	            --rm                                       \
-                ${INTERACTIVE_MODE}                        \
-                ${TOGGLE_ENTRYPOINT}                       \
-                -p 8888:8888                               \
-                --workdir ${WORKDIR}                       \
-                --env JDK_TO_USE=${JDK_TO_USE:-}           \
-                --env JAVA_OPTS=${JAVA_OPTS:-}             \
-                --env VALOHAI_PASSWORD=${VALOHAI_PASSWORD} \
-                ${VOLUMES_SHARED}                          \
+	${TIME_IT} docker run                                    \
+	            --rm                                         \
+                ${INTERACTIVE_MODE}                          \
+                ${TOGGLE_ENTRYPOINT}                         \
+                -p 8888:8888                                 \
+                --workdir ${WORKDIR}                         \
+                --env JDK_TO_USE=${JDK_TO_USE:-}             \
+                --env JAVA_OPTS=${JAVA_OPTS:-}               \
+                --env VALOHAI_PASSWORD=${VALOHAI_PASSWORD:-} \
+                ${VOLUMES_SHARED}                            \
                 "${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}"
 }
 
@@ -194,9 +203,7 @@ JDK_TO_USE=""
 INTERACTIVE_MODE="--interactive --tty"
 TIME_IT="time"
 
-## When run in the console mode (command-prompt available)
-TOGGLE_ENTRYPOINT="--entrypoint /bin/bash"
-VOLUMES_SHARED="--volume "$(pwd)":/home/jovyan/work --volume "$(pwd)"/shared:${WORKDIR}/shared"
+NOTEBOOK_MODE=false
 
 if [[ "$#" -eq 0 ]]; then
 	echo "No parameter has been passed. Please see usage below:"
@@ -218,10 +225,7 @@ while [[ "$#" -gt 0 ]]; do case $1 in
                          shift;;
   --javaopts)            JAVA_OPTS="${2:-}";
                          shift;;
-  --notebookMode)        ## When run in the notebook mode (command-prompt NOT available)
-                         TOGGLE_ENTRYPOINT=""; ### Disable the ENTRPOINT & CMD directives
-                         VOLUMES_SHARED="--volume "$(pwd)/shared/notebooks":/home/jovyan/work";
-                         ;;
+  --notebookMode)        NOTEBOOK_MODE=true;;
   --buildImage)          buildImage;
                          exit 0;;
   --runContainer)        runContainer;
