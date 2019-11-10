@@ -2,7 +2,7 @@ FROM valohai/jupyhai as base-image
 
 ### Install JDK 8 from AdoptOpenJDK images
 
-COPY --from=adoptopenjdk/openjdk8:jdk8u212-b03 /opt/java /opt/java
+COPY --from=adoptopenjdk/openjdk9 /opt/java /opt/java
 
 ### Install curl needed for rest of the tasks
 
@@ -12,27 +12,15 @@ RUN apt-get update && apt-get install -qy curl
 ARG WORKDIR
 WORKDIR ${WORKDIR}
 
-### GraalVM installation
+### Java setup
 
-ARG GRAALVM_HOME
-ENV GRAALVM_HOME=${GRAALVM_HOME}
-
-ARG JAVA_8_HOME
-ENV JAVA_8_HOME=${JAVA_8_HOME}
-ENV JAVA_HOME=${JAVA_8_HOME}
+ARG JAVA_9_HOME
+ENV JAVA_HOME=${JAVA_9_HOME}
 ENV PATH=${JAVA_HOME}/bin:${PATH}
-
-COPY --from=findepi/graalvm /graalvm/ /opt/java/graalvm/
-
-### Remove unused Java binaries
-
-RUN rm -fr ${GRAALVM_HOME}/languages ${GRAALVM_HOME}/jre/languages 
 
 ### Test Java
 
-RUN ${JAVA_8_HOME}/bin/java -version
-
-RUN ${GRAALVM_HOME}/bin/java -version
+RUN ${JAVA_9_HOME}/bin/java -version
 
 ### Install packages
 

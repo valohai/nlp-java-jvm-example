@@ -53,8 +53,6 @@ runContainer() {
                 ${TOGGLE_ENTRYPOINT}                         \
                 -p 8888:8888                                 \
                 --workdir ${WORKDIR}                         \
-                --env JDK_TO_USE=${JDK_TO_USE:-}             \
-                --env JAVA_OPTS=${JAVA_OPTS:-}               \
                 --env VALOHAI_PASSWORD=${VALOHAI_PASSWORD:-} \
                 ${VOLUMES_SHARED}                            \
                 "${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}"
@@ -70,8 +68,7 @@ buildImage() {
 	time docker pull ${BASE_FULL_DOCKER_TAG_NAME}:${BASE_IMAGE_VERSION} || true
 	time docker build                                                  \
 	             --build-arg WORKDIR=${WORKDIR}                        \
-	             --build-arg JAVA_8_HOME="/opt/java/openjdk"           \
-	             --build-arg GRAALVM_HOME="/opt/java/graalvm"          \
+	             --build-arg JAVA_9_HOME="/opt/java/openjdk"           \
 	             -t ${BASE_FULL_DOCKER_TAG_NAME}:${BASE_IMAGE_VERSION} \
 	             "${IMAGES_DIR}/base/."
 	echo "* Finished building NLP base docker image ${BASE_FULL_DOCKER_TAG_NAME}:${BASE_IMAGE_VERSION}"
@@ -134,8 +131,6 @@ showUsageText() {
        Usage: $0 --dockerUserName [docker user name]
                                  --language [language id]
                                  --detach
-                                 --jdk [GRAALVM]
-                                 --javaopts [java opt arguments]
                                  --notebookMode
                                  --cleanup
                                  --buildImage
@@ -148,11 +143,6 @@ showUsageText() {
        --language            language id as in java, clojure, scala, etc...
        --detach              run container and detach from it,
                              return control to console
-       --jdk                 name of the JDK to use (currently supports 
-                             GRAALVM only, default is blank which 
-                             enables the traditional JDK)
-       --javaopts            sets the JAVA_OPTS environment variable 
-                             inside the container as it starts
        --notebookMode        runs the Jupyter/Jupyhai notebook server 
                              (default: returns to command-prompt on startup)
        --cleanup             (command action) remove exited containers and 
@@ -189,7 +179,6 @@ setVariables() {
 #### Start of script
 SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGES_DIR="${SCRIPT_CURRENT_DIR}/images"
-GRAALVM_VERSION="${GRAALVM_VERSION:-19.1.1}"
 
 BASE_FULL_DOCKER_TAG_NAME=""
 FULL_DOCKER_TAG_NAME=""
@@ -197,7 +186,6 @@ DOCKER_USER_NAME="${DOCKER_USER_NAME:-}"
 
 #/home/nlp-java
 WORKDIR=/home/jovyan/work
-JDK_TO_USE=""
 
 INTERACTIVE_MODE="--interactive --tty"
 TIME_IT="time"
@@ -220,10 +208,6 @@ while [[ "$#" -gt 0 ]]; do case $1 in
                          shift;;
   --detach)              INTERACTIVE_MODE="--detach";
                          TIME_IT="";;
-  --jdk)                 JDK_TO_USE="${2:-}";
-                         shift;;
-  --javaopts)            JAVA_OPTS="${2:-}";
-                         shift;;
   --notebookMode)        NOTEBOOK_MODE=true;;
   --buildImage)          buildImage;
                          exit 0;;
