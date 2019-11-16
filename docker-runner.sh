@@ -25,21 +25,57 @@ findImage() {
 	echo $(docker images ${IMAGE_NAME} -q | head -n1 || true)
 }
 
+getOpenCommand() {
+  if [[ "$(uname)" = "Linux" ]]; then
+     echo "xdg-open"
+  elif [[ "$(uname)" = "Darwin" ]]; then
+     echo "open"
+  fi
+}
+
+openNotebookInBrowser() {
+	echo "**********************************"
+	echo "Running container in detached mode"
+	echo "**********************************"
+
+	CONTAINER_ID=$(docker ps | grep "${HOST_PORT}->${CONTAINER_PORT}" | awk '{print $1}' || true)
+
+	sleep 5
+
+	echo ""; echo "Displaying the missed log messages for container ${CONTAINER_ID}"
+	docker logs ${CONTAINER_ID}
+	URL="http://localhost:${HOST_PORT}"
+	echo ""; echo "Opening Jupyter Notebook in a browser:"
+	echo " ${URL}"
+	OPEN_CMD="$(getOpenCommand)"
+	"${OPEN_CMD}" "${URL}"
+
+	echo "";
+	echo "****************************************************"
+	echo "Attaching back to container, with ID ${CONTAINER_ID}"
+	echo "****************************************************"
+	echo ""; echo "You can terminate your Jupyter session with a Ctrl-C"
+	echo "";
+	docker attach ${CONTAINER_ID}
+}
+
 runContainer() {
 	askDockerUserNameIfAbsent
 	setVariables
 
 	if [[ "${NOTEBOOK_MODE}" = "true" ]]; then
 		## When run in the notebook mode (command-prompt NOT available)
-		TOGGLE_ENTRYPOINT=""; ### Disable the ENTRPOINT & CMD directives
-		VOLUMES_SHARED="--volume "$(pwd)/shared/notebooks":/home/jovyan/work";
+		TOGGLE_ENTRYPOINT=""; ### Disable the ENTRYPOINT & CMD directives
+		VOLUMES_SHARED="--volume "$(pwd)/shared/notebooks":${WORKDIR}/work --volume "$(pwd)"/shared:${WORKDIR}/shared";
+
 		if [[ -z "${VALOHAI_PASSWORD:-}" ]]; then
 			read -s -p "Enter Valohai password: " VALOHAI_PASSWORD
 		fi
+		INTERACTIVE_MODE="--detach ${INTERACTIVE_MODE}"
 	else
 		## When run in the console mode (command-prompt available)
 		TOGGLE_ENTRYPOINT="--entrypoint /bin/bash"
-		VOLUMES_SHARED="--volume "$(pwd)":/home/jovyan/work --volume "$(pwd)"/shared:${WORKDIR}/shared"
+		VOLUMES_SHARED="--volume "$(pwd)":${WORKDIR}/work --volume "$(pwd)"/shared:${WORKDIR}/shared"
 	fi  
 
 	echo ""; 
@@ -51,11 +87,15 @@ runContainer() {
 	            --rm                                         \
                 ${INTERACTIVE_MODE}                          \
                 ${TOGGLE_ENTRYPOINT}                         \
-                -p 8888:8888                                 \
+                -p ${HOST_PORT}:${CONTAINER_PORT}            \
                 --workdir ${WORKDIR}                         \
                 --env VALOHAI_PASSWORD=${VALOHAI_PASSWORD:-} \
                 ${VOLUMES_SHARED}                            \
                 "${FULL_DOCKER_TAG_NAME}:${IMAGE_VERSION}"
+
+    if [[ "${NOTEBOOK_MODE}" = "true" ]]; then
+	  openNotebookInBrowser
+    fi
 }
 
 buildImage() {
@@ -184,13 +224,15 @@ BASE_FULL_DOCKER_TAG_NAME=""
 FULL_DOCKER_TAG_NAME=""
 DOCKER_USER_NAME="${DOCKER_USER_NAME:-}"
 
-#/home/nlp-java
-WORKDIR=/home/jovyan/work
+WORKDIR=/home/jovyan
+JDK_TO_USE=""
 
 INTERACTIVE_MODE="--interactive --tty"
 TIME_IT="time"
 
 NOTEBOOK_MODE=false
+HOST_PORT=8888
+CONTAINER_PORT=8888
 
 if [[ "$#" -eq 0 ]]; then
 	echo "No parameter has been passed. Please see usage below:"
