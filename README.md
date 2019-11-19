@@ -75,7 +75,7 @@ $ ./docker-runner.sh --help
                                  --help
 
        --dockerUserName      docker user name as on Docker Hub
-                             (mandatory with build, run and push commands)
+                             (mandatory with build and push commands)
        --language            language id as in java, clojure, scala, etc...
        --detach              run container and detach from it,
                              return control to console
