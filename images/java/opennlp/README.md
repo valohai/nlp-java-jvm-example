@@ -2,7 +2,7 @@
 
 Run a docker container with Apache OpenNLP written in Java, running under the traditional Java 8 (from OpenJDK or another source) or GraalVM.
 
-Find out more about [Natural Language Processing](https://en.wikipedia.org/wiki/Natural_language_processing) from the [NLP section](../../../../../natural-language-processing/README.md#natural-language-processing-nlp) section.
+Find out more about [Natural Language Processing](https://en.wikipedia.org/wiki/Natural_language_processing) from the [NLP section](https://github.com/neomatrix369/awesome-ai-ml-dl/tree/master/natural-language-processing#natural-language-processing-nlp) section.
 
 Startup in traditional JDK or GraalVM mode.
 
@@ -79,22 +79,19 @@ Find the [NLP Java/JVM Docker Image on Docker Hub](https://hub.docker.com/r/neom
 
 ### Apache OpenNLP
 
-- [Apache OpenNLP](https://opennlp.apache.org/) | [GitHub](https://github.com/apache/opennlp) | [Mailing list](https://opennlp.apache.org/mailing-lists.html)
+- [Apache OpenNLP](https://opennlp.apache.org/) | [GitHub](https://github.com/apache/opennlp) | [Mailing list](https://opennlp.apache.org/mailing-lists.html) | [@apacheopennlp](https://twitter.com/@apacheopennlp)
 - Docs
-    - https://opennlp.apache.org/docs/
+    - [Documentation resources](https://opennlp.apache.org/docs/)
     - [Apache OpenNLP Tools Javadoc](https://opennlp.apache.org/docs/1.9.1/apidocs/opennlp-tools/index.html)
-    - Manual
-        - https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html
+    - [Manual](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html)
 - Download
-    - Apache OpenNLP Jar/binary
-        - https://opennlp.apache.org/download.html
+    - [Apache OpenNLP Jar/binary](https://opennlp.apache.org/download.html)
     - Model Zoo
-        - https://opennlp.apache.org/models.html
-        - http://www.mirrorservice.org/sites/ftp.apache.org/opennlp/models/langdetect/1.8.3/langdetect-183.bin
-        - Older models to support the examples in the docs
-            - http://opennlp.sourceforge.net/models-1.5/ 
+        - [Models page](https://opennlp.apache.org/models.html)
+        - [Language Detect model](http://www.mirrorservice.org/sites/ftp.apache.org/opennlp/models/langdetect/1.8.3/langdetect-183.bin)
+        - [Older models to support the examples in the docs](http://opennlp.sourceforge.net/models-1.5/)
 - Legend to support the examples in the docs
-    - List of languages: https://www.apache.org/dist/opennlp/models/langdetect/1.8.3/README.txt
+    - [List of languages](https://www.apache.org/dist/opennlp/models/langdetect/1.8.3/README.txt)
     - [Penn Treebank tag set](https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html)
 
 ### Other NLP Java/JVM libraries
@@ -124,13 +121,16 @@ Find the [NLP Java/JVM Docker Image on Docker Hub](https://hub.docker.com/r/neom
               * https://github.com/eclipse/deeplearning4j-examples/tree/master/dl4j-examples
               * https://github.com/eclipse/deeplearning4j/tree/master/deeplearning4j/deeplearning4j-nlp-parent
 
+### Other related posts
+  - [How to do Deep Learning for Java on the Valohai Platform?](https://blog.valohai.com/nlp_with_dl4j_in_java_all_from_the_command-line?from=3oxenia9mtr6)
+  - [NLP with DL4J in Java, all from the command-line](https://blog.valohai.com/nlp_with_dl4j_in_java_all_from_the_command-line?from=3oxenia9mtr6)
+
 # Contributing
 
 Contributions are very welcome, please share back with the wider community (and get credited for it)!
 
-Please have a look at the [CONTRIBUTING](../../../../../CONTRIBUTING.md) guidelines, also have a read about our [licensing](../../../../../LICENSE.md) policy.
+Please have a look at the [CONTRIBUTING](../../../CONTRIBUTING.md) guidelines, also have a read about our [licensing](../../../LICENSE.txt) policy.
 
 ---
 
-Back to [NLP page](../../../../../natural-language-processing/README.md#natural-language-processing-nlp) </br>
-Back to [main page (table of contents)](../../../../../README.md)
+Back to [main page (table of contents)](../../../README.md#nlp-javajvm-)

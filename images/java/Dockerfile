@@ -40,5 +40,8 @@ COPY mallet.sh mallet.sh
 ### https://github.com/datquocnguyen/RDRPOSTagger
 COPY rdrposttagger.sh rdrposttagger.sh
 
-ARG GROUP
-RUN cd ${WORKDIR} && chown -R jovyan:${GROUP} .
+ARG CONTAINER_GROUP
+ARG CONTAINER_USER
+RUN cd ${WORKDIR} && chown -R ${CONTAINER_USER}:${CONTAINER_GROUP} .
+
+USER ${CONTAINER_USER}

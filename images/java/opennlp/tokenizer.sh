@@ -20,17 +20,8 @@ set -e
 set -u
 set -o pipefail
 
-downloadTokeniseModel() {
-  echo "Checking if model ${MODEL_FILENAME} (${language}) exists..."
-  if [[ -s "${SHARED_FOLDER}/${MODEL_FILENAME}" ]]; then
-    echo "Found model ${MODEL_FILENAME} (${language})"
-  else
-    echo "Downloading model ${MODEL_FILENAME} (${language})..."
-    curl -O -J -L \
-         "http://opennlp.sourceforge.net/models-${MODEL_VERSION}/${MODEL_FILENAME}"
-    mv ${MODEL_FILENAME} ${SHARED_FOLDER}     
-  fi
-}
+SCRIPT_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
+source ${SCRIPT_DIR}/common-functions.sh
 
 showUsageText() {
     cat << HEREDOC
@@ -53,37 +44,31 @@ HEREDOC
   exit 1
 }
 
-if [[ "$#" -eq 0 ]]; then
-  echo "No parameter has been passed. Please see usage below:"
-  showUsageText
-fi
-
-SHARED_FOLDER="../shared/"
-language=en
-APACHE_OPENNLP_VERSION=1.9.1
-MODEL_VERSION=1.5
-MODEL_FILENAME=""
-METHOD="simple"
-
 APACHE_OPENNLP_CMD=""
 setCommand() {
-  APACHE_OPENNLP_CMD="${SHARED_FOLDER}/apache-opennlp-${APACHE_OPENNLP_VERSION}/bin/opennlp
-                                                                                  ${METHOD}
-                                                         ${SHARED_FOLDER}/${MODEL_FILENAME}
-  "  
+  if [[ "${METHOD}" = "SimpleTokenizer" ]]; then
+    APACHE_OPENNLP_CMD="${OPENNLP_BINARY} ${METHOD}"
+  else
+    APACHE_OPENNLP_CMD="${OPENNLP_BINARY} ${METHOD} ${SHARED_FOLDER}/${MODEL_FILENAME}"
+  fi
 }
 
 setMethod() {
   METHOD=$(echo ${METHOD} | awk '{print tolower($0)}' || true)
   if [[ "${METHOD}" = "simple" ]]; then
     METHOD=SimpleTokenizer;
-    MODEL_FILENAME=""
   elif [[ "${METHOD}" = "learnable" ]]; then
     METHOD=TokenizerME
     MODEL_FILENAME="${language}-token.bin"
-    downloadTokeniseModel;
+    downloadModel;
   fi
 }
+
+MODEL_VERSION=1.5
+MODEL_FILENAME=""
+METHOD="simple"
+
+checkIfNoParamHasBeenPassedIn "$#"
 
 while [[ "$#" -gt 0 ]]; do case $1 in
   --help)                showUsageText;
@@ -92,19 +77,20 @@ while [[ "$#" -gt 0 ]]; do case $1 in
                          setMethod
                          shift;;
   --text)                PLAIN_TEXT="${2:-}";
+                         checkIfApacheOpenNLPIsPresent
+                         setCommand
                          TMPFILE=$(mktemp)
-                         echo ${PLAIN_TEXT} > ${TMPFILE}
-                         cat ${TMPFILE} | ${SHARED_FOLDER}/apache-opennlp-${APACHE_OPENNLP_VERSION}/bin/opennlp ${METHOD}
+                         echo "${PLAIN_TEXT}" > ${TMPFILE}
+                         cat ${TMPFILE} | ${APACHE_OPENNLP_CMD}
                          rm -f ${TMPFILE}
                          exit 0;;
   --file)                FILENAME="${2:-}";
-                         cat ${FILENAME}| ${APACHE_OPENNLP_CMD};
+                         checkIfApacheOpenNLPIsPresent
+                         setCommand
+                         cat ${FILENAME} | ${APACHE_OPENNLP_CMD};
                          exit 0;;
   *) echo "Unknown parameter passed: $1";
      showUsageText;
 esac; shift; done
 
-if [[ "$#" -eq 0 ]]; then
-  echo "No command action passed in as parameter. Please see usage below:"
-  showUsageText
-fi
+checkIfNoActionParamHasBeenPassedIn "$#"

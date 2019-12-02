@@ -43,3 +43,13 @@ Execution time: 0.935 seconds
 ```
 $ ./chunker.sh --file article.txt
 ```
+
+# Contributing
+
+Contributions are very welcome, please share back with the wider community (and get credited for it)!
+
+Please have a look at the [CONTRIBUTING](../../../CONTRIBUTING.md) guidelines, also have a read about our [licensing](../../../LICENSE.txt) policy.
+
+---
+
+Back to [main page (table of contents)](../../../README.md#nlp-javajvm-)

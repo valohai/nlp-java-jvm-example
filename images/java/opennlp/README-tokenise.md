@@ -71,9 +71,8 @@ $ ./tokenizer.sh --method learnable --file article.txt
 
 Contributions are very welcome, please share back with the wider community (and get credited for it)!
 
-Please have a look at the [CONTRIBUTING](../../../../../CONTRIBUTING.md) guidelines, also have a read about our [licensing](../../../../../LICENSE.md) policy.
+Please have a look at the [CONTRIBUTING](../../../CONTRIBUTING.md) guidelines, also have a read about our [licensing](../../../LICENSE.txt) policy.
 
 ---
 
-Back to [NLP page](../../../../../natural-language-processing/README.md#natural-language-processing-nlp) </br>
-Back to [main page (table of contents)](../../../../../README.md)
+Back to [main page (table of contents)](../../../README.md#nlp-javajvm-)

@@ -21,10 +21,15 @@ __pycache__
 *.map
 .idea/
 
-/.project
-/.pydevproject
-.ipynb_checkpoints
-*shared/
 *.cache
 .local
 .bash_history
+/.project
+/.pydevproject
+.ipynb_checkpoints
+.valohai
+shared/*.bin
+shared/apache*
+!shared/notebooks/*.*
+shared/notebooks/.ipynb_checkpoints
+shared/notebooks/.valohai

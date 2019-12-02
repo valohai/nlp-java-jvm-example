@@ -2,11 +2,11 @@
 
 NLP Java: [![NLP Java](https://img.shields.io/docker/pulls/neomatrix369/nlp-java.svg)](https://hub.docker.com/r/neomatrix369/nlp-java) | NLP Clojure: [![NLP Clojure](https://img.shields.io/docker/pulls/neomatrix369/nlp-clojure.svg)](https://hub.docker.com/r/neomatrix369/nlp-clojure) | NLP Kotlin: [![NLP Kotlin](https://img.shields.io/docker/pulls/neomatrix369/nlp-kotlin.svg)](https://hub.docker.com/r/neomatrix369/nlp-kotlin) | NLP Scala: [![NLP Scala](https://img.shields.io/docker/pulls/neomatrix369/nlp-scala.svg)](https://hub.docker.com/r/neomatrix369/nlp-scala)
 
+---
+
 Run a docker container with NLP libraries/frameworks written in Java/JVM languages, running under the traditional Java 9 (from OpenJDK or another source) or GraalVM.
 
-Find out more about [Natural Language Processing](https://en.wikipedia.org/wiki/Natural_language_processing) from the [NLP section](../../natural-language-processing/README.md#natural-language-processing-nlp) section.
-
-Startup in traditional JDK or GraalVM mode (CLI mode operations only).
+Find out more about [Natural Language Processing](https://en.wikipedia.org/wiki/Natural_language_processing) from the [NLP section](https://github.com/neomatrix369/awesome-ai-ml-dl/blob/master/natural-language-processing/README.md#natural-language-processing-nlp) section.
 
 ## Goals
 
@@ -48,7 +48,7 @@ Startup in traditional JDK or GraalVM mode (CLI mode operations only).
 
 ## Scripts provided
 
-**Go to [the previous folder](../nlp-java-jvm) to find the below scripts.**
+**Scroll up to find the below provided scripts**
 
 - [docker-runner.sh](./docker-runner.sh): can perform a number of the below actions depending on the flags passed to it:
     - runs the container and brings you to the command prompt inside the container:
@@ -156,9 +156,8 @@ Find the [NLP Java/JVM Docker Image on Docker Hub](https://hub.docker.com/r/neom
 
 Contributions are very welcome, please share back with the wider community (and get credited for it)!
 
-Please have a look at the [CONTRIBUTING](../../CONTRIBUTING.md) guidelines, also have a read about our [licensing](../../LICENSE.md) policy.
+Please have a look at the [CONTRIBUTING](CONTRIBUTING.md) guidelines, also have a read about our [licensing](LICENSE.txt) policy.
 
 ---
 
-Back to [NLP page](../../natural-language-processing/README.md#natural-language-processing-nlp) </br>
-Back to [main page (table of contents)](../../README.md)
+Go to [NLP page](https://github.com/neomatrix369/awesome-ai-ml-dl/blob/master/natural-language-processing/README.md#natural-language-processing-nlp)
